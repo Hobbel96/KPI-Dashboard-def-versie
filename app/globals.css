@@ -1,0 +1,41 @@
+@import "tailwindcss";
+
+:root {
+  --brand-yellow: #fec409;
+  --brand-yellow-light: #fedf78;
+  --brand-orange: #ef7103;
+  --brand-orange-dark: #bf5a02;
+  --charcoal: #545454;
+  --surface: #ffffff;
+  --bg-soft: #faf9f6;
+  --line: #e7e0d3;
+  --text-muted: #6f675d;
+  --status-dark-green: #2f6b3c;
+  --status-green: #82b66d;
+  --status-amber: #e3b23c;
+  --status-red: #c1503f;
+  --status-none: #f3efe7;
+}
+
+@theme inline {
+  --color-brand-yellow: var(--brand-yellow);
+  --color-brand-yellow-light: var(--brand-yellow-light);
+  --color-brand-orange: var(--brand-orange);
+  --color-brand-orange-dark: var(--brand-orange-dark);
+  --color-charcoal: var(--charcoal);
+  --color-surface: var(--surface);
+  --color-bg-soft: var(--bg-soft);
+  --color-line: var(--line);
+  --color-text-muted: var(--text-muted);
+  --color-status-green: var(--status-green);
+  --color-status-red: var(--status-red);
+  --color-status-amber: var(--status-amber);
+  --font-sans: var(--font-ibm-plex-sans);
+  --font-serif: var(--font-fraunces);
+  --font-mono: var(--font-ibm-plex-mono);
+}
+
+body {
+  @apply bg-bg-soft text-charcoal;
+  font-family: var(--font-ibm-plex-sans);
+}

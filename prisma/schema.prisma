@@ -1,0 +1,202 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "sqlite"
+  url       = env("DATABASE_URL")
+}
+
+// Enums as strings (SQLite doesn't support native enums in Prisma)
+// Will be converted to ENUM when migrating to PostgreSQL
+
+model User {
+  id                     String   @id @default(cuid())
+  email                  String   @unique
+  name                   String
+  passwordHash           String
+  role                   String  // "AM" or "MT"
+  availableDaysPerWeek   Float?   // AM-only: beschikbare dagen per week; null for MT
+  teamId                 String?
+  team                   Team?    @relation(fields: [teamId], references: [id], onDelete: SetNull)
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  // Relations
+  opdrachten             Opdracht[]       @relation("OpdrachtOwner")
+  weeklyReports          WeeklyReport[]
+  prognosesForMe         Prognose[]       @relation("PrognoseSubject")
+  prognosesEnteredByMe   Prognose[]       @relation("PrognoseAuthor")
+  mtOnlyKpiValuesEntered MtOnlyKpiValue[] @relation("MtOnlyKpiAuthor")
+  sessions               Session[]
+}
+
+model Team {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  members User[]
+  kpis    Kpi[]
+}
+
+model Klant {
+  id        String   @id @default(cuid())
+  naam      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  opdrachten Opdracht[]
+}
+
+model Opdracht {
+  id        String          @id @default(cuid())
+  amId      String
+  am        User            @relation("OpdrachtOwner", fields: [amId], references: [id], onDelete: Cascade)
+  klantId   String
+  klant     Klant           @relation(fields: [klantId], references: [id], onDelete: Cascade)
+  naam      String
+  rol       String          // "WAM" or "RAM" - stable per opdracht
+  actief    Boolean         @default(true)
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+
+  entries   OpdrachtEntry[]
+
+  @@index([amId])
+  @@index([klantId])
+}
+
+model WeeklyReport {
+  id          String         @id @default(cuid())
+  amId        String
+  am          User           @relation(fields: [amId], references: [id], onDelete: Cascade)
+  isoYear     Int
+  isoWeek     Int
+  weekcijfer  Float?         // single weekcijfer per week, not per opdracht
+  status      String         @default("DRAFT")  // "DRAFT" or "SUBMITTED"
+  submittedAt DateTime?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  entries     OpdrachtEntry[]
+
+  @@unique([amId, isoYear, isoWeek])
+  @@index([amId, isoYear, isoWeek])
+}
+
+model OpdrachtEntry {
+  id                 String       @id @default(cuid())
+  weeklyReportId     String
+  weeklyReport       WeeklyReport @relation(fields: [weeklyReportId], references: [id], onDelete: Cascade)
+  opdrachtId         String
+  opdracht           Opdracht     @relation(fields: [opdrachtId], references: [id], onDelete: Cascade)
+
+  // Shared fields (both WAM and RAM)
+  werkdagen          Float        @default(0)
+  factureerbareDagen Float        @default(0)
+
+  // WAM-only fields
+  bezoeken           Int?
+  klanten            Int?
+
+  // Shared across WAM and RAM
+  afspraken          Int?
+
+  // RAM-only fields
+  nieuweAfspraken    Int?
+  deals              Int?
+
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+
+  @@unique([weeklyReportId, opdrachtId])
+  @@index([weeklyReportId])
+  @@index([opdrachtId])
+}
+
+model Prognose {
+  id                 String   @id @default(cuid())
+  amId               String
+  am                 User     @relation("PrognoseSubject", fields: [amId], references: [id], onDelete: Cascade)
+  isoYear            Int
+  isoWeek            Int
+
+  // Prognose values (same fields as realization)
+  weekcijfer         Float?
+  werkdagen          Float?
+  factureerbareDagen Float?
+  bezoeken           Int?
+  klanten            Int?
+  afspraken          Int?
+  nieuweAfspraken    Int?
+  deals              Int?
+
+  // Metadata
+  enteredById        String
+  enteredBy          User     @relation("PrognoseAuthor", fields: [enteredById], references: [id])
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@unique([amId, isoYear, isoWeek])
+  @@index([amId, isoYear])
+}
+
+model Kpi {
+  id           String   @id @default(cuid())
+  naam         String
+  beschrijving String?
+  eenheid      String?
+  prognose     Float?
+  teamId       String?  // null = algemeen KPI, otherwise team-specific
+  team         Team?    @relation(fields: [teamId], references: [id], onDelete: SetNull)
+  actief       Boolean  @default(true)
+  volgorde     Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([actief])
+  @@index([teamId])
+}
+
+model MtOnlyKpi {
+  id        String           @id @default(cuid())
+  naam      String
+  eenheid   String?
+  actief    Boolean          @default(true)
+  volgorde  Int              @default(0)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  waarden   MtOnlyKpiValue[]
+
+  @@index([actief])
+}
+
+model MtOnlyKpiValue {
+  id          String    @id @default(cuid())
+  mtOnlyKpiId String
+  mtOnlyKpi   MtOnlyKpi @relation(fields: [mtOnlyKpiId], references: [id], onDelete: Cascade)
+  periodKey   String    // e.g. "2026-W38" (weekly) or "2026-Q3" (quarterly)
+  waarde      Float
+  enteredById String
+  enteredBy   User      @relation("MtOnlyKpiAuthor", fields: [enteredById], references: [id])
+  enteredAt   DateTime  @default(now())
+
+  @@unique([mtOnlyKpiId, periodKey])
+  @@index([mtOnlyKpiId])
+}
+
+
+model Session {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+}
