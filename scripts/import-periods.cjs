@@ -15,7 +15,7 @@ const periodWeeks = {
 };
 
 async function importPeriods() {
-  console.log("📥 Importing P6-P10 weekcijfer data...\n");
+  console.log("📥 Importing P6-P10 data (weekcijfer, factureerbare dagen, prognose)...\n");
 
   const downloadPath = "C:/Users/hobbe/Downloads";
   const files = [
@@ -56,19 +56,31 @@ async function importPeriods() {
       });
 
       if (!am) {
-        console.log(`  ⚠️  ${sheetName} - no AM found`);
         continue;
       }
 
       const sheet = workbook.Sheets[sheetName];
 
-      // Extract weekcijfer data from cells I10:I13 (0-indexed: row 9-12, col 8)
+      // Get total factureerbare dagen from row 17 (I17)
+      const factureerbareCellAddress = XLSX.utils.encode_cell({ r: 16, c: 8 }); // I17 (0-indexed)
+      let totalFactureerbareCellValue = sheet[factureerbareCellAddress]?.v;
+      let totalFactureerbaar = null;
+
+      if (totalFactureerbareCellValue !== undefined && totalFactureerbareCellValue !== null && totalFactureerbareCellValue !== "") {
+        if (typeof totalFactureerbareCellValue === "string") {
+          totalFactureerbaar = parseFloat(totalFactureerbareCellValue.replace(/[^0-9.]/g, ""));
+          if (isNaN(totalFactureerbaar)) totalFactureerbaar = null;
+        } else if (typeof totalFactureerbareCellValue === "number") {
+          totalFactureerbaar = totalFactureerbareCellValue;
+        }
+      }
+
+      // Extract weekcijfer from I10:I13
       for (let i = 0; i < weeks.length; i++) {
         const weekNum = weeks[i];
         const cellAddress = XLSX.utils.encode_cell({ r: 9 + i, c: 8 }); // I10:I13
         let cellValue = sheet[cellAddress]?.v;
 
-        // Handle string values with dashes (e.g., "7-" becomes 7)
         let weekcijfer = null;
         if (cellValue !== undefined && cellValue !== null && cellValue !== "") {
           if (typeof cellValue === "string") {
@@ -79,9 +91,26 @@ async function importPeriods() {
           }
         }
 
-        if (weekcijfer === null) continue;
+        // Create or update Prognose with 45 days target
+        await db.prognose.upsert({
+          where: {
+            amId_isoYear_isoWeek: {
+              amId: am.id,
+              isoYear: year,
+              isoWeek: weekNum,
+            },
+          },
+          update: { factureerbareDagen: 45 },
+          create: {
+            amId: am.id,
+            isoYear: year,
+            isoWeek: weekNum,
+            factureerbareDagen: 45,
+            enteredById: am.id,
+          },
+        });
 
-        // Create or update WeeklyReport with weekcijfer
+        // Create or update WeeklyReport
         const report = await db.weeklyReport.upsert({
           where: {
             amId_isoYear_isoWeek: {
@@ -103,6 +132,50 @@ async function importPeriods() {
           },
         });
 
+        // Create or update OpdrachtEntry with factureerbare dagen (realisatie)
+        if (totalFactureerbaar !== null) {
+          let opdracht = await db.opdracht.findFirst({
+            where: { amId: am.id, naam: "Seed Data" },
+          });
+
+          if (!opdracht) {
+            const klant = await db.klant.findFirst({
+              where: { naam: "De Vlasschuur" },
+            });
+
+            opdracht = await db.opdracht.create({
+              data: {
+                naam: "Seed Data",
+                rol: "WAM",
+                amId: am.id,
+                klantId: klant?.id || "",
+              },
+            });
+          }
+
+          // Delete existing entry
+          await db.opdrachtEntry.deleteMany({
+            where: {
+              weeklyReportId: report.id,
+              opdrachtId: opdracht.id,
+            },
+          });
+
+          // Create new entry
+          await db.opdrachtEntry.create({
+            data: {
+              weeklyReportId: report.id,
+              opdrachtId: opdracht.id,
+              factureerbareDagen: totalFactureerbaar,
+              werkdagen: 0,
+              bezoeken: 0,
+              klanten: 0,
+              afspraken: 0,
+              deals: 0,
+            },
+          });
+        }
+
         totalImported++;
       }
 
@@ -110,7 +183,7 @@ async function importPeriods() {
     }
   }
 
-  console.log(`\n✅ Klaar! ${totalImported} weekcijfers ingeladen.`);
+  console.log(`\n✅ Klaar! ${totalImported} records ingeladen.`);
 }
 
 importPeriods()
