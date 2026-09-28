@@ -33,10 +33,30 @@ export default async function PrognósesPage() {
         <p className="text-text-muted mt-2">Vul prognoses in voor komende weken (minimaal 1 week vooruit)</p>
       </div>
 
+      {/* AM Selector */}
+      <div className="bg-surface rounded-lg border border-line p-6">
+        <h3 className="text-sm font-bold text-charcoal mb-4">Snel navigeren naar accountmanager:</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
+          {ams.map((am) => (
+            <a
+              key={am.id}
+              href={`#am-${am.id}`}
+              className="p-3 text-left rounded border border-line hover:border-brand-orange hover:bg-bg-soft transition"
+            >
+              <div className="font-medium text-charcoal text-sm">{am.name}</div>
+              <div className="text-xs text-text-muted truncate">{am.email}</div>
+            </a>
+          ))}
+        </div>
+      </div>
+
       <div className="space-y-8">
         {ams.map((am) => (
-          <div key={am.id} className="bg-surface rounded-lg border border-line p-6">
-            <h3 className="text-lg font-bold text-charcoal mb-4">{am.name}</h3>
+          <div key={am.id} id={`am-${am.id}`} className="bg-surface rounded-lg border border-line p-6 scroll-mt-24">
+            <div className="mb-6 pb-4 border-b border-line">
+              <h3 className="text-lg font-bold text-charcoal">{am.name}</h3>
+              <p className="text-sm text-text-muted mt-1">{am.email}</p>
+            </div>
 
             <div className="space-y-4">
               {nextWeeks.map((week) => {
