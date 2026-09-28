@@ -84,28 +84,17 @@ async function importPeriods() {
         }
       }
 
-      if (!weekRowStart) {
-        console.log(`  ⚠️  ${am.name} - structure not found`);
-        continue;
-      }
-
-      // Extract week data
+      // Extract week data from cells I10:I13 (0-indexed: row 9-12, col 8)
       for (let i = 0; i < weeks.length; i++) {
-        const weekRow = weekRowStart + i;
-        const cellA = XLSX.utils.encode_cell({ r: weekRow, c: 0 });
-        const weekNum = sheet[cellA]?.v;
+        const weekNum = weeks[i];
+        const cellAddress = XLSX.utils.encode_cell({ r: 9 + i, c: 8 }); // I10:I13
+        let cellValue = sheet[cellAddress]?.v || 0;
 
-        if (!weekNum || !weeks.includes(weekNum)) continue;
-
-        // Sum all factureerbare dagen columns (starting from column B)
-        let totalFactureerbaar = 0;
-        for (let col = 1; col < 6; col++) {
-          const cell = XLSX.utils.encode_cell({ r: weekRow, c: col });
-          const value = sheet[cell]?.v;
-          if (typeof value === "number") {
-            totalFactureerbaar += value;
-          }
+        // Handle string values with dashes (e.g., "7-" becomes 7)
+        if (typeof cellValue === "string") {
+          cellValue = parseFloat(cellValue.replace(/[^0-9.]/g, "")) || 0;
         }
+        const totalFactureerbaar = parseFloat(cellValue);
 
         // Create/update WeeklyReport
         const report = await db.weeklyReport.upsert({
