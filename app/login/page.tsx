@@ -72,7 +72,7 @@ export default function LoginPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="ronald.vandervelde@devlasschuur.nl"
+                placeholder="tim.schepmans@devlasschuur.nl"
                 required
                 className="w-full px-4 py-2 border border-line rounded-lg focus:outline-none focus:border-brand-orange"
               />
@@ -108,8 +108,8 @@ export default function LoginPage() {
           </form>
 
           <p className="text-xs text-text-muted mt-6 text-center">
-            Demo: ronald.vandervelde@devlasschuur.nl / mt@devlasschuur.nl<br />
-            Wachtwoord: demo123
+            Demo (MT): tim.schepmans@devlasschuur.nl / tim123<br />
+            Demo (AM): tim.am@devlasschuur.nl / tim.am123
           </p>
         </div>
       </div>
