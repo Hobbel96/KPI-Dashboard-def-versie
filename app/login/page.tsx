@@ -108,8 +108,14 @@ export default function LoginPage() {
           </form>
 
           <p className="text-xs text-text-muted mt-6 text-center">
-            Demo (MT): tim.schepmans@devlasschuur.nl / tim123<br />
-            Demo (AM): tim.am@devlasschuur.nl / tim.am123
+            <strong>MT Accounts:</strong><br />
+            Tim: tim.schepmans@devlasschuur.nl / tim123<br />
+            Dave: dave.niestadt@devlasschuur.nl / dave123<br />
+            Naftali: naftali.vlaanderen@devlasschuur.nl / naftali123<br />
+            Jan: jan.hobbel@devlasschuur.nl / jan123<br />
+            <br />
+            <strong>Tim als AM:</strong><br />
+            tim.am@devlasschuur.nl / tim.am123
           </p>
         </div>
       </div>
