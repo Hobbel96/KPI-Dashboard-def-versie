@@ -27,7 +27,7 @@ export function BezettingsgradChart({ data }: BezettingsgradChartProps) {
   return (
     <div className="w-full h-80 bg-surface rounded-lg border border-line p-6">
       <h3 className="text-lg font-bold text-charcoal mb-4">
-        Bezettingsgraad - 12 Weken (Prognose vs Realisatie)
+        Bezettingsgraad (Prognose vs Realisatie)
       </h3>
       <ResponsiveContainer width="100%" height="100%">
         <LineChart
@@ -44,7 +44,7 @@ export function BezettingsgradChart({ data }: BezettingsgradChartProps) {
             label={{ value: "Bezettingsgraad %", angle: -90, position: "insideLeft" }}
             stroke="#545454"
             tick={{ fontSize: 12 }}
-            domain={[0, 100]}
+            domain={[50, 100]}
           />
           <Tooltip
             contentStyle={{
