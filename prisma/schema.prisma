@@ -134,6 +134,9 @@ model Prognose {
   nieuweAfspraken    Int?
   deals              Int?
 
+  // Bezettingsgraad realisatie (loaded directly from KPI Dashboard)
+  bezettingsgradRealisatiePercentage Float?
+
   // Metadata
   enteredById        String
   enteredBy          User     @relation("PrognoseAuthor", fields: [enteredById], references: [id])

@@ -75,7 +75,14 @@ export async function get12WeeksChartData() {
         ) / 10
       : 0;
 
-    const realisatieBezetting = weekReports.length > 0
+    // Check if we have a direct bezettingsgraad percentage from KPI Dashboard
+    const kpiDashboardBezetting = weekPrognoses.find(
+      (p) => p.bezettingsgradRealisatiePercentage !== null
+    );
+
+    const realisatieBezetting = kpiDashboardBezetting
+      ? kpiDashboardBezetting.bezettingsgradRealisatiePercentage
+      : weekReports.length > 0
       ? Math.round(
           ((totalFactureerbar || 0) / (totalAvailable || 1)) * 100 * 10
         ) / 10
