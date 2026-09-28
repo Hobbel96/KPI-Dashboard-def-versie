@@ -15,7 +15,7 @@ const periodWeeks = {
 };
 
 async function importPeriods() {
-  console.log("📥 Importing P6-P10 data...\n");
+  console.log("📥 Importing P6-P10 weekcijfer data...\n");
 
   const downloadPath = "C:/Users/hobbe/Downloads";
   const files = [
@@ -61,42 +61,27 @@ async function importPeriods() {
       }
 
       const sheet = workbook.Sheets[sheetName];
-      let periodo = null;
-      let weeks_text = null;
 
-      // Find period and weeks info
-      for (let row = 0; row < 10; row++) {
-        const periodoCell = XLSX.utils.encode_cell({ r: row, c: 1 });
-        const weeksCell = XLSX.utils.encode_cell({ r: row, c: 1 });
-        if (sheet[periodoCell]?.v === period) {
-          periodo = period;
-        }
-      }
-
-      // Extract factureerbare dagen data
-      // Looking for "AFGESPROKEN DAGEN PER WEEK" section
-      let weekRowStart = null;
-      for (let row = 0; row < 30; row++) {
-        const cellA = XLSX.utils.encode_cell({ r: row, c: 0 });
-        if (sheet[cellA]?.v?.includes("AFGESPROKEN")) {
-          weekRowStart = row + 2; // Skip headers
-          break;
-        }
-      }
-
-      // Extract week data from cells I10:I13 (0-indexed: row 9-12, col 8)
+      // Extract weekcijfer data from cells I10:I13 (0-indexed: row 9-12, col 8)
       for (let i = 0; i < weeks.length; i++) {
         const weekNum = weeks[i];
         const cellAddress = XLSX.utils.encode_cell({ r: 9 + i, c: 8 }); // I10:I13
-        let cellValue = sheet[cellAddress]?.v || 0;
+        let cellValue = sheet[cellAddress]?.v;
 
         // Handle string values with dashes (e.g., "7-" becomes 7)
-        if (typeof cellValue === "string") {
-          cellValue = parseFloat(cellValue.replace(/[^0-9.]/g, "")) || 0;
+        let weekcijfer = null;
+        if (cellValue !== undefined && cellValue !== null && cellValue !== "") {
+          if (typeof cellValue === "string") {
+            weekcijfer = parseFloat(cellValue.replace(/[^0-9.]/g, ""));
+            if (isNaN(weekcijfer)) weekcijfer = null;
+          } else if (typeof cellValue === "number") {
+            weekcijfer = cellValue;
+          }
         }
-        const totalFactureerbaar = parseFloat(cellValue);
 
-        // Create/update WeeklyReport
+        if (weekcijfer === null) continue;
+
+        // Create or update WeeklyReport with weekcijfer
         const report = await db.weeklyReport.upsert({
           where: {
             amId_isoYear_isoWeek: {
@@ -105,53 +90,16 @@ async function importPeriods() {
               isoWeek: weekNum,
             },
           },
-          update: { status: "SUBMITTED" },
+          update: {
+            weekcijfer: weekcijfer,
+            status: "SUBMITTED"
+          },
           create: {
             amId: am.id,
             isoYear: year,
             isoWeek: weekNum,
+            weekcijfer: weekcijfer,
             status: "SUBMITTED",
-          },
-        });
-
-        // Find or create seed opdracht
-        let opdracht = await db.opdracht.findFirst({
-          where: { amId: am.id, naam: "Seed Data" },
-        });
-
-        if (!opdracht) {
-          const klant = await db.klant.findFirst({
-            where: { naam: "De Vlasschuur" },
-          });
-
-          opdracht = await db.opdracht.create({
-            data: {
-              naam: "Seed Data",
-              rol: "WAM",
-              amId: am.id,
-              klantId: klant?.id || "",
-            },
-          });
-        }
-
-        // Delete and recreate entry
-        await db.opdrachtEntry.deleteMany({
-          where: {
-            weeklyReportId: report.id,
-            opdrachtId: opdracht.id,
-          },
-        });
-
-        await db.opdrachtEntry.create({
-          data: {
-            weeklyReportId: report.id,
-            opdrachtId: opdracht.id,
-            factureerbareDagen: totalFactureerbaar,
-            werkdagen: 0,
-            bezoeken: 0,
-            klanten: 0,
-            afspraken: 0,
-            deals: 0,
           },
         });
 
@@ -162,7 +110,7 @@ async function importPeriods() {
     }
   }
 
-  console.log(`\n✅ Klaar! ${totalImported} records ingeladen.`);
+  console.log(`\n✅ Klaar! ${totalImported} weekcijfers ingeladen.`);
 }
 
 importPeriods()
