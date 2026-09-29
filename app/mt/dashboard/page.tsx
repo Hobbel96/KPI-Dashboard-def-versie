@@ -27,14 +27,43 @@ export default async function DashboardPage() {
         </p>
       </div>
 
-      {/* Charts - 12 Weeks (2 columns) */}
+      {/* Charts - 12 Weeks */}
       <div className="grid grid-cols-2 gap-6">
-        <BezettingsgradChart data={chartData} />
+        {/* Row 1: Bezettingsgraad + Factureerbare Dagen Table */}
+        <div className="col-span-1">
+          <BezettingsgradChart data={chartData} />
+        </div>
+        <div className="col-span-1 bg-surface rounded-lg border border-line p-6">
+          <h3 className="text-lg font-bold text-charcoal mb-4">Factureerbare Dagen (Huidige Week)</h3>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-line">
+                  <th className="text-left py-2 px-2 text-text-muted">Accountmanager</th>
+                  <th className="text-right py-2 px-2 text-text-muted">Dagen</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.ams.map((am) => (
+                  <tr key={am.id} className="border-b border-line hover:bg-bg-soft">
+                    <td className="py-3 px-2 font-medium">{am.name}</td>
+                    <td className="py-3 px-2 text-right">{Math.round(am.totalFactureerbar || 0)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Row 2: Bezoeken + Klanten */}
         <BezoekenChart data={chartData} />
         <KlantenChart data={chartData} />
+
+        {/* Row 3: Afspraken + Weekcijfer */}
         <AfsprakenChart data={chartData} />
         <WeekcijferChart data={chartData} />
-        <FacturabeleDAgenChart data={chartData} />
+
+        {/* Row 4: RAM Charts */}
         <NieuweAfsprakenRamChart data={chartData} />
         <NieuweDealRamChart data={chartData} />
       </div>
