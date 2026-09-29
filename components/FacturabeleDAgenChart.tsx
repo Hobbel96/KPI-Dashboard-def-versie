@@ -27,7 +27,7 @@ export function FacturabeleDAgenChart({ data }: FacturabeleDAgenChartProps) {
   return (
     <div className="w-full h-80 bg-surface rounded-lg border border-line p-6">
       <h3 className="text-lg font-bold text-charcoal mb-4">
-        Factureerbare Dagen (Prognose vs Realisatie)
+        Factureerbare Dagen
       </h3>
       <ResponsiveContainer width="100%" height="100%">
         <BarChart
