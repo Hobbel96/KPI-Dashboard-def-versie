@@ -13,6 +13,18 @@ const klantenPrognosisData = {
   32: 18, 33: 15.5, 34: 18.5, 35: 19.5, 36: 23.5, 37: 32.5, 38: 28.5,
 };
 
+const bezoekenRealisatieData = {
+  16: 96, 17: 114, 18: 147, 19: 149, 20: 125, 21: 74, 22: 138, 23: 165,
+  24: 162, 25: 130, 26: 109, 27: 142, 28: 176, 29: 98, 30: 129, 31: 155,
+  32: 187, 33: 112, 34: 38, 35: 160, 36: 152, 37: 148, 38: 216,
+};
+
+const bezoekenPrognosisData = {
+  16: 0, 17: 108, 18: 40, 19: 0, 20: 0, 21: 0, 22: 0, 23: 0,
+  24: 80, 25: 128, 26: 128, 27: 156, 28: 188, 29: 124, 30: 120, 31: 152,
+  32: 144, 33: 124, 34: 106, 35: 160, 36: 188, 37: 260, 38: 228,
+};
+
 export async function get12WeeksChartData() {
   const weeks = [];
 
@@ -88,16 +100,22 @@ export async function get12WeeksChartData() {
       : 0;
 
     // Bezoeken
-    const prognoseBezoeken = weekPrognoses.reduce(
-      (sum, p) => sum + (p.bezoeken || 0),
-      0
-    );
+    const hardcodedBezoekenPrognose = bezoekenPrognosisData[w.week as keyof typeof bezoekenPrognosisData];
+    const prognoseBezoeken = hardcodedBezoekenPrognose !== undefined
+      ? hardcodedBezoekenPrognose
+      : weekPrognoses.reduce(
+          (sum, p) => sum + (p.bezoeken || 0),
+          0
+        );
 
+    const hardcodedBezoekenRealisatie = bezoekenRealisatieData[w.week as keyof typeof bezoekenRealisatieData];
     const mtBezoekenData = weekPrognoses.reduce(
       (sum, p) => sum + (p.bezoeken || 0),
       0
     );
-    const realisatieBezoeken = mtBezoekenData > 0
+    const realisatieBezoeken = hardcodedBezoekenRealisatie
+      ? hardcodedBezoekenRealisatie
+      : mtBezoekenData > 0
       ? mtBezoekenData
       : weekReports.reduce(
           (sum, r) =>
