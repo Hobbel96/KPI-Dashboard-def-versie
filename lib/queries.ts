@@ -1,6 +1,12 @@
 import { db } from "./db";
 import { getISOWeek, weekKey } from "./period";
 
+const klantenRealisatieData = {
+  16: 20, 17: 19, 18: 21, 19: 32, 20: 24, 21: 10, 22: 25, 23: 24,
+  24: 20, 25: 15, 26: 24, 27: 21, 28: 21, 29: 14, 30: 21, 31: 19,
+  32: 22, 33: 19, 34: 7, 35: 22, 36: 25, 37: 37, 38: 28,
+};
+
 export async function get12WeeksChartData() {
   const weeks = [];
 
@@ -104,7 +110,13 @@ export async function get12WeeksChartData() {
       (sum, p) => sum + (p.klanten || 0),
       0
     );
-    const realisatieKlanten = mtKlantenData > 0
+
+    // Check if we have hardcoded realisatie from Excel
+    const hardcodedKlantenRealisatie = klantenRealisatieData[w.week as keyof typeof klantenRealisatieData];
+
+    const realisatieKlanten = hardcodedKlantenRealisatie
+      ? hardcodedKlantenRealisatie
+      : mtKlantenData > 0
       ? mtKlantenData
       : weekReports.reduce(
           (sum, r) =>
