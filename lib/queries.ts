@@ -25,6 +25,18 @@ const bezoekenPrognosisData = {
   32: 144, 33: 124, 34: 106, 35: 160, 36: 188, 37: 260, 38: 228,
 };
 
+const afsprakenRealisatieData = {
+  16: 25, 17: 21, 18: 14, 19: 29, 20: 24, 21: 19, 22: 26, 23: 18,
+  24: 38, 25: 29, 26: 22, 27: 31, 28: 25, 29: 19, 30: 25, 31: 36,
+  32: 35, 33: 16, 34: 6, 35: 29, 36: 20, 37: 42, 38: 28,
+};
+
+const afsprakenPrognosisData = {
+  16: 0, 17: 13, 18: 0, 19: 0, 20: 0, 21: 0, 22: 0, 23: 0,
+  24: 20, 25: 32, 26: 32, 27: 39, 28: 47, 29: 31, 30: 30, 31: 38,
+  32: 36, 33: 31, 34: 79, 35: 39, 36: 47, 37: 65, 38: 57,
+};
+
 export async function get12WeeksChartData() {
   const weeks = [];
 
@@ -153,16 +165,22 @@ export async function get12WeeksChartData() {
         );
 
     // Afspraken
-    const prognoseAfspraken = weekPrognoses.reduce(
-      (sum, p) => sum + (p.afspraken || 0),
-      0
-    );
+    const hardcodedAfsprakenPrognose = afsprakenPrognosisData[w.week as keyof typeof afsprakenPrognosisData];
+    const prognoseAfspraken = hardcodedAfsprakenPrognose !== undefined
+      ? hardcodedAfsprakenPrognose
+      : weekPrognoses.reduce(
+          (sum, p) => sum + (p.afspraken || 0),
+          0
+        );
 
+    const hardcodedAfsprakenRealisatie = afsprakenRealisatieData[w.week as keyof typeof afsprakenRealisatieData];
     const mtAfsprakenData = weekPrognoses.reduce(
       (sum, p) => sum + (p.afspraken || 0),
       0
     );
-    const realisatieAfspraken = mtAfsprakenData > 0
+    const realisatieAfspraken = hardcodedAfsprakenRealisatie
+      ? hardcodedAfsprakenRealisatie
+      : mtAfsprakenData > 0
       ? mtAfsprakenData
       : weekReports.reduce(
           (sum, r) =>
