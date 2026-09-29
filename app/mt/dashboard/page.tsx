@@ -8,6 +8,8 @@ import { KlantenChart } from "@/components/KlantenChart";
 import { AfsprakenChart } from "@/components/AfsprakenChart";
 import { WeekcijferChart } from "@/components/WeekcijferChart";
 import { FacturabeleDAgenChart } from "@/components/FacturabeleDAgenChart";
+import { NieuweAfsprakenRamChart } from "@/components/NieuweAfsprakenRamChart";
+import { NieuweDealRamChart } from "@/components/NieuweDealRamChart";
 
 export default async function DashboardPage() {
   await requireAuth("MT");
@@ -33,6 +35,8 @@ export default async function DashboardPage() {
         <AfsprakenChart data={chartData} />
         <WeekcijferChart data={chartData} />
         <FacturabeleDAgenChart data={chartData} />
+        <NieuweAfsprakenRamChart data={chartData} />
+        <NieuweDealRamChart data={chartData} />
       </div>
 
       {/* Team Totalen */}

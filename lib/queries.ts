@@ -37,6 +37,29 @@ const afsprakenPrognosisData = {
   32: 36, 33: 31, 34: 79, 35: 39, 36: 47, 37: 65, 38: 57,
 };
 
+const nieuweAfsprakenRamRealisatieData = {
+  16: 1, 17: 10, 18: 5, 19: 6, 20: 4, 21: 6, 22: 1, 23: 4,
+  24: 9, 25: 3, 26: 4, 27: 5, 28: 5, 29: 8, 30: 2, 31: 4,
+  32: 2, 34: 2, 35: 3, 36: 2,
+};
+
+const nieuweAfsprakenRamPrognosisData = {
+  16: 0, 17: 0, 18: 0, 19: 0, 20: 0, 21: 0, 22: 0, 23: 0,
+  24: 0, 25: 2.5, 26: 4.81, 27: 6.16, 28: 6.16, 29: 6.16, 30: 5.31, 31: 6.16,
+  32: 2, 33: 2.7, 34: 3.36, 35: 4.83, 36: 4.33, 37: 4.33, 38: 4.33,
+};
+
+const nieuweDealRamRealisatieData = {
+  17: 1, 18: 1, 19: 1, 21: 1, 22: 3, 23: 3, 25: 1, 26: 1,
+  27: 1, 28: 2, 29: 3, 31: 1, 34: 2, 36: 1, 37: 1, 38: 1,
+};
+
+const nieuweDealRamPrognosisData = {
+  16: 0, 17: 0, 18: 0, 19: 0, 20: 0, 21: 0, 22: 0, 23: 0,
+  24: 0, 25: 0, 26: 0, 27: 0, 28: 0, 29: 0, 30: 0, 31: 0,
+  32: 0, 33: 0, 34: 0, 35: 0, 36: 0, 37: 0, 38: 0,
+};
+
 export async function get12WeeksChartData() {
   const weeks = [];
 
@@ -220,6 +243,46 @@ export async function get12WeeksChartData() {
           0
         );
 
+    // Nieuwe afspraken RAM
+    const hardcodedNieuweAfsprakenRamPrognose = nieuweAfsprakenRamPrognosisData[w.week as keyof typeof nieuweAfsprakenRamPrognosisData];
+    const prognoseNieuweAfsprakenRam = hardcodedNieuweAfsprakenRamPrognose !== undefined
+      ? hardcodedNieuweAfsprakenRamPrognose
+      : weekPrognoses.reduce(
+          (sum, p) => sum + (p.nieuweAfspraken || 0),
+          0
+        );
+
+    const hardcodedNieuweAfsprakenRamRealisatie = nieuweAfsprakenRamRealisatieData[w.week as keyof typeof nieuweAfsprakenRamRealisatieData];
+    const mtNieuweAfsprakenRamData = weekPrognoses.reduce(
+      (sum, p) => sum + (p.nieuweAfspraken || 0),
+      0
+    );
+    const realisatieNieuweAfsprakenRam = hardcodedNieuweAfsprakenRamRealisatie
+      ? hardcodedNieuweAfsprakenRamRealisatie
+      : mtNieuweAfsprakenRamData > 0
+      ? mtNieuweAfsprakenRamData
+      : 0;
+
+    // Nieuwe deals RAM
+    const hardcodedNieuweDealRamPrognose = nieuweDealRamPrognosisData[w.week as keyof typeof nieuweDealRamPrognosisData];
+    const prognoseNieuweDealRam = hardcodedNieuweDealRamPrognose !== undefined
+      ? hardcodedNieuweDealRamPrognose
+      : weekPrognoses.reduce(
+          (sum, p) => sum + (p.deals || 0),
+          0
+        );
+
+    const hardcodedNieuweDealRamRealisatie = nieuweDealRamRealisatieData[w.week as keyof typeof nieuweDealRamRealisatieData];
+    const mtNieuweDealRamData = weekPrognoses.reduce(
+      (sum, p) => sum + (p.deals || 0),
+      0
+    );
+    const realisatieNieuweDealRam = hardcodedNieuweDealRamRealisatie
+      ? hardcodedNieuweDealRamRealisatie
+      : mtNieuweDealRamData > 0
+      ? mtNieuweDealRamData
+      : 0;
+
     return {
       week: `W${String(w.week).padStart(2, "0")}`,
       weekNum: w.week,
@@ -236,6 +299,10 @@ export async function get12WeeksChartData() {
       weekcijfer: gemiddeldWeekcijfer,
       factureerbare_prognose: 45,
       factureerbare_dagen: totalFactureerbareDagen || 0,
+      nieuwe_afspraken_ram_prognose: prognoseNieuweAfsprakenRam,
+      nieuwe_afspraken_ram_realisatie: realisatieNieuweAfsprakenRam,
+      nieuwe_deals_ram_prognose: prognoseNieuweDealRam,
+      nieuwe_deals_ram_realisatie: realisatieNieuweDealRam,
     };
   });
 
