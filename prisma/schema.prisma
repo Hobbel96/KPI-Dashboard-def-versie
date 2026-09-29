@@ -17,6 +17,7 @@ model User {
   name                   String
   passwordHash           String
   role                   String  // "AM" or "MT"
+  amType                 String?  // "WAM" or "RAM"; null for MT
   availableDaysPerWeek   Float?   // AM-only: beschikbare dagen per week; null for MT
   teamId                 String?
   team                   Team?    @relation(fields: [teamId], references: [id], onDelete: SetNull)
@@ -136,6 +137,9 @@ model Prognose {
 
   // Bezettingsgraad realisatie (loaded directly from KPI Dashboard)
   bezettingsgradRealisatiePercentage Float?
+
+  // Factureerbare dagen realisatie (loaded directly from KPI Dashboard)
+  factureerbareDagenRealisatie Float?
 
   // Metadata
   enteredById        String

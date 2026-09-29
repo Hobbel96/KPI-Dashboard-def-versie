@@ -15,6 +15,7 @@ interface ChartDataPoint {
   week: string;
   weekNum: number;
   year: number;
+  factureerbare_prognose: number;
   factureerbare_dagen: number;
 }
 
@@ -26,7 +27,7 @@ export function FacturabeleDAgenChart({ data }: FacturabeleDAgenChartProps) {
   return (
     <div className="w-full h-80 bg-surface rounded-lg border border-line p-6">
       <h3 className="text-lg font-bold text-charcoal mb-4">
-        Factureerbare Dagen - 12 Weken
+        Factureerbare Dagen (Prognose vs Realisatie)
       </h3>
       <ResponsiveContainer width="100%" height="100%">
         <BarChart
@@ -54,9 +55,15 @@ export function FacturabeleDAgenChart({ data }: FacturabeleDAgenChartProps) {
           />
           <Legend />
           <Bar
+            dataKey="factureerbare_prognose"
+            fill="#FEDF78"
+            name="Prognose"
+            radius={[4, 4, 0, 0]}
+          />
+          <Bar
             dataKey="factureerbare_dagen"
             fill="#EF7103"
-            name="Factureerbare Dagen"
+            name="Realisatie"
             radius={[4, 4, 0, 0]}
           />
         </BarChart>

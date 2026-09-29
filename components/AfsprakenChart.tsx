@@ -16,7 +16,7 @@ interface ChartDataPoint {
   weekNum: number;
   year: number;
   afspraken_prognose: number;
-  afspraken_realisatie: number;
+  afspraken_realisatie: number | null;
 }
 
 interface AfsprakenChartProps {
@@ -27,7 +27,7 @@ export function AfsprakenChart({ data }: AfsprakenChartProps) {
   return (
     <div className="w-full h-80 bg-surface rounded-lg border border-line p-6">
       <h3 className="text-lg font-bold text-charcoal mb-4">
-        Afspraken - 12 Weken (Prognose vs Realisatie)
+        Afspraken (Prognose vs Realisatie)
       </h3>
       <ResponsiveContainer width="100%" height="100%">
         <LineChart

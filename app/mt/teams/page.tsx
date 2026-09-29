@@ -100,7 +100,7 @@ export default async function TeamsPage() {
               </div>
 
               {/* Add Members */}
-              {(unassignedAMs.length > 0 || team.members.length < allAMs.length) && (
+              {allAMs.length > team.members.length && (
                 <form action={assignAmToTeamAction} className="flex gap-2">
                   <select
                     name="userId"
@@ -109,7 +109,7 @@ export default async function TeamsPage() {
                     required
                   >
                     <option value="">Selecteer accountmanager...</option>
-                    {unassignedAMs.map((am) => (
+                    {allAMs.map((am) => (
                       <option key={am.id} value={am.id}>
                         {am.name}
                       </option>

@@ -5,7 +5,7 @@ const path = require("path");
 const db = new PrismaClient();
 
 async function importKPIDashboard() {
-  console.log("📥 Importing KPI Dashboard Bezettingsgraad Realisatie...\n");
+  console.log("📥 Importing KPI Dashboard Bezettingsgraad & Factureerbare Dagen...\n");
 
   const filepath = path.join(__dirname, "..", "KPI-Dashboard.xlsx");
   const workbook = XLSX.readFile(filepath);
@@ -16,11 +16,13 @@ async function importKPIDashboard() {
 
   // Row 3 = weeknummers (0-indexed = row 2)
   // Row 6 = bezettingsgraad realisatie (0-indexed = row 5)
+  // Row 7 = factureerbare dagen (0-indexed = row 6)
 
-  const weekRow = 2; // Row 3 in Excel
-  const bezettingsgradRow = 5; // Row 6 in Excel
+  const weekRow = 2;
+  const bezettingsgradRow = 5;
+  const factureerbareDagenRow = 6;
 
-  // Get first AM to store the global bezettingsgraad data
+  // Get first AM to store the global data
   const firstAM = await db.user.findFirst({
     where: { role: "AM" },
   });
@@ -36,9 +38,11 @@ async function importKPIDashboard() {
   for (let col = 1; col <= 50; col++) {
     const weekCell = XLSX.utils.encode_cell({ r: weekRow, c: col });
     const bezettingsgradCell = XLSX.utils.encode_cell({ r: bezettingsgradRow, c: col });
+    const factureerbareDagenCell = XLSX.utils.encode_cell({ r: factureerbareDagenRow, c: col });
 
     const weekValue = sheet[weekCell]?.v;
     const bezettingsgradValue = sheet[bezettingsgradCell]?.v;
+    const factureerbareDagenValue = sheet[factureerbareDagenCell]?.v;
 
     if (!weekValue) continue;
 
@@ -47,15 +51,18 @@ async function importKPIDashboard() {
     if (!weekMatch) continue;
 
     const weekNum = parseInt(weekMatch[1]);
-    if (isNaN(weekNum) || weekNum < 15 || weekNum > 49) continue;
+    if (isNaN(weekNum) || weekNum < 15 || weekNum > 38) continue;
 
     const bezettingsgradPercentage = parseFloat(bezettingsgradValue);
     if (isNaN(bezettingsgradPercentage)) continue;
 
+    const factureerbareDagen = parseFloat(factureerbareDagenValue);
+    const factureerbareDagenRealisatie = !isNaN(factureerbareDagen) ? factureerbareDagen : null;
+
     // Convert decimal to percentage (0.9535 -> 95.35)
     const percentage = Math.round(bezettingsgradPercentage * 10000) / 100;
 
-    // Upsert Prognose with bezettingsgradRealisatiePercentage
+    // Upsert Prognose
     await db.prognose.upsert({
       where: {
         amId_isoYear_isoWeek: {
@@ -66,17 +73,20 @@ async function importKPIDashboard() {
       },
       update: {
         bezettingsgradRealisatiePercentage: percentage,
+        factureerbareDagenRealisatie: factureerbareDagenRealisatie,
       },
       create: {
         amId: firstAM.id,
         isoYear: year,
         isoWeek: weekNum,
         bezettingsgradRealisatiePercentage: percentage,
+        factureerbareDagenRealisatie: factureerbareDagenRealisatie,
         enteredById: firstAM.id,
       },
     });
 
-    console.log(`  ✓ Week ${weekNum}: ${percentage}%`);
+    const dagenStr = factureerbareDagenRealisatie !== null ? ` | ${factureerbareDagenRealisatie} dagen` : "";
+    console.log(`  ✓ Week ${weekNum}: ${percentage}%${dagenStr}`);
     totalImported++;
   }
 

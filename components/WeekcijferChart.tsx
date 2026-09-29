@@ -15,6 +15,7 @@ interface ChartDataPoint {
   week: string;
   weekNum: number;
   year: number;
+  weekcijfer_prognose: number;
   weekcijfer: number;
 }
 
@@ -26,7 +27,7 @@ export function WeekcijferChart({ data }: WeekcijferChartProps) {
   return (
     <div className="w-full h-80 bg-surface rounded-lg border border-line p-6">
       <h3 className="text-lg font-bold text-charcoal mb-4">
-        Gemiddeld Weekcijfer - 12 Weken
+        Gemiddeld Weekcijfer (Prognose vs Realisatie)
       </h3>
       <ResponsiveContainer width="100%" height="100%">
         <LineChart
@@ -56,12 +57,22 @@ export function WeekcijferChart({ data }: WeekcijferChartProps) {
           <Legend />
           <Line
             type="monotone"
+            dataKey="weekcijfer_prognose"
+            stroke="#FEDF78"
+            strokeWidth={3}
+            dot={{ fill: "#FEC409", r: 4 }}
+            activeDot={{ r: 6 }}
+            name="Prognose"
+            connectNulls
+          />
+          <Line
+            type="monotone"
             dataKey="weekcijfer"
             stroke="#EF7103"
             strokeWidth={3}
             dot={{ fill: "#EF7103", r: 4 }}
             activeDot={{ r: 6 }}
-            name="Weekcijfer"
+            name="Realisatie"
             connectNulls
           />
         </LineChart>

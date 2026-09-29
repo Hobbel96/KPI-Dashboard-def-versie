@@ -15,6 +15,7 @@ export async function upsertPrognoseAction(formData: FormData) {
     weekcijfer: formData.get("weekcijfer") ? parseFloat(formData.get("weekcijfer") as string) : null,
     werkdagen: formData.get("werkdagen") ? parseFloat(formData.get("werkdagen") as string) : null,
     factureerbareDagen: formData.get("factureerbareDagen") ? parseFloat(formData.get("factureerbareDagen") as string) : null,
+    factureerbareDagenRealisatie: formData.get("factureerbareDagenRealisatie") ? parseFloat(formData.get("factureerbareDagenRealisatie") as string) : null,
     bezoeken: formData.get("bezoeken") ? parseInt(formData.get("bezoeken") as string) : null,
     klanten: formData.get("klanten") ? parseInt(formData.get("klanten") as string) : null,
     afspraken: formData.get("afspraken") ? parseInt(formData.get("afspraken") as string) : null,

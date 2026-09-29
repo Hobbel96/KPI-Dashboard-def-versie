@@ -25,6 +25,29 @@ export async function createMtOnlyKpiAction(formData: FormData) {
   }
 }
 
+export async function updateMtOnlyKpiAction(formData: FormData) {
+  await requireAuth("MT");
+
+  const id = formData.get("id") as string;
+  const naam = formData.get("naam") as string;
+  const eenheid = formData.get("eenheid") as string;
+
+  if (!id || !naam.trim()) return;
+
+  try {
+    await db.mtOnlyKpi.update({
+      where: { id },
+      data: {
+        naam: naam.trim(),
+        eenheid: eenheid.trim() || null,
+      },
+    });
+    revalidatePath("/mt/mt-only-kpis");
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 export async function upsertMtOnlyKpiValueAction(formData: FormData) {
   const user = await requireAuth("MT");
 

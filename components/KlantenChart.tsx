@@ -16,7 +16,7 @@ interface ChartDataPoint {
   weekNum: number;
   year: number;
   klanten_prognose: number;
-  klanten_realisatie: number;
+  klanten_realisatie: number | null;
 }
 
 interface KlantenChartProps {
@@ -27,7 +27,7 @@ export function KlantenChart({ data }: KlantenChartProps) {
   return (
     <div className="w-full h-80 bg-surface rounded-lg border border-line p-6">
       <h3 className="text-lg font-bold text-charcoal mb-4">
-        Klanten - 12 Weken (Prognose vs Realisatie)
+        Klanten (Prognose vs Realisatie)
       </h3>
       <ResponsiveContainer width="100%" height="100%">
         <LineChart

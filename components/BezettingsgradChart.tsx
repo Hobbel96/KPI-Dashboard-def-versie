@@ -16,7 +16,7 @@ interface ChartDataPoint {
   weekNum: number;
   year: number;
   bezetting_prognose: number;
-  bezetting_realisatie: number;
+  bezetting_realisatie: number | null;
 }
 
 interface BezettingsgradChartProps {
@@ -44,7 +44,7 @@ export function BezettingsgradChart({ data }: BezettingsgradChartProps) {
             label={{ value: "Bezettingsgraad %", angle: -90, position: "insideLeft" }}
             stroke="#545454"
             tick={{ fontSize: 12 }}
-            domain={[50, 100]}
+            domain={[70, 100]}
           />
           <Tooltip
             contentStyle={{

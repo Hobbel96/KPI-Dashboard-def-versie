@@ -4,9 +4,10 @@ import { getISOWeek, weekKey } from "./period";
 export async function get12WeeksChartData() {
   const weeks = [];
 
-  // Generate weeks 15-49 (35 weeks)
+  // Generate weeks 15-49, excluding week 22 and weeks 43+
   const year = new Date().getFullYear();
   for (let week = 15; week <= 49; week++) {
+    if (week === 22 || week >= 43) continue;
     weeks.push({ year, week });
   }
 
@@ -59,21 +60,7 @@ export async function get12WeeksChartData() {
       0
     );
 
-    const prognoseTotalFactureerbar = weekPrognoses.reduce(
-      (sum, p) => sum + (p.factureerbareDagen || 0),
-      0
-    );
-
-    const prognoseTotalAvailable = weekPrognoses.reduce((sum, p) => {
-      // Get the AM's available days
-      return sum + (p.am.availableDaysPerWeek || 0);
-    }, 0);
-
-    const prognoseBezetting = prognoseTotalAvailable > 0
-      ? Math.round(
-          (prognoseTotalFactureerbar / prognoseTotalAvailable) * 100 * 10
-        ) / 10
-      : 0;
+    const prognoseBezetting = 95;
 
     // Check if we have a direct bezettingsgraad percentage from KPI Dashboard
     const kpiDashboardBezetting = weekPrognoses.find(
@@ -94,12 +81,18 @@ export async function get12WeeksChartData() {
       0
     );
 
-    const realisatieBezoeken = weekReports.reduce(
-      (sum, r) =>
-        sum +
-        r.entries.reduce((s, e) => s + (e.bezoeken || 0), 0),
+    const mtBezoekenData = weekPrognoses.reduce(
+      (sum, p) => sum + (p.bezoeken || 0),
       0
     );
+    const realisatieBezoeken = mtBezoekenData > 0
+      ? mtBezoekenData
+      : weekReports.reduce(
+          (sum, r) =>
+            sum +
+            r.entries.reduce((s, e) => s + (e.bezoeken || 0), 0),
+          0
+        );
 
     // Klanten
     const prognoseKlanten = weekPrognoses.reduce(
@@ -107,12 +100,18 @@ export async function get12WeeksChartData() {
       0
     );
 
-    const realisatieKlanten = weekReports.reduce(
-      (sum, r) =>
-        sum +
-        r.entries.reduce((s, e) => s + (e.klanten || 0), 0),
+    const mtKlantenData = weekPrognoses.reduce(
+      (sum, p) => sum + (p.klanten || 0),
       0
     );
+    const realisatieKlanten = mtKlantenData > 0
+      ? mtKlantenData
+      : weekReports.reduce(
+          (sum, r) =>
+            sum +
+            r.entries.reduce((s, e) => s + (e.klanten || 0), 0),
+          0
+        );
 
     // Afspraken
     const prognoseAfspraken = weekPrognoses.reduce(
@@ -120,17 +119,29 @@ export async function get12WeeksChartData() {
       0
     );
 
-    const realisatieAfspraken = weekReports.reduce(
-      (sum, r) =>
-        sum +
-        r.entries.reduce((s, e) => s + (e.afspraken || 0), 0),
+    const mtAfsprakenData = weekPrognoses.reduce(
+      (sum, p) => sum + (p.afspraken || 0),
       0
     );
+    const realisatieAfspraken = mtAfsprakenData > 0
+      ? mtAfsprakenData
+      : weekReports.reduce(
+          (sum, r) =>
+            sum +
+            r.entries.reduce((s, e) => s + (e.afspraken || 0), 0),
+          0
+        );
 
-    // Weekcijfer
-    const weekcijfers = weekReports
-      .map((r) => r.weekcijfer)
+    // Weekcijfer (MT leidend)
+    const mtWeekcijfers = weekPrognoses
+      .map((p) => p.weekcijfer)
       .filter((wc) => wc !== null && wc !== undefined) as number[];
+
+    const weekcijfers = mtWeekcijfers.length > 0
+      ? mtWeekcijfers
+      : weekReports
+          .map((r) => r.weekcijfer)
+          .filter((wc) => wc !== null && wc !== undefined) as number[];
 
     const gemiddeldWeekcijfer = weekcijfers.length > 0
       ? Math.round(
@@ -139,12 +150,18 @@ export async function get12WeeksChartData() {
       : 0;
 
     // Factureerbare Dagen
-    const totalFactureerbareDagen = weekReports.reduce(
-      (sum, r) =>
-        sum +
-        r.entries.reduce((s, e) => s + (e.factureerbareDagen || 0), 0),
-      0
+    const kpiDashboardFactureerbareDagen = weekPrognoses.find(
+      (p) => p.factureerbareDagenRealisatie !== null
     );
+
+    const totalFactureerbareDagen = kpiDashboardFactureerbareDagen
+      ? kpiDashboardFactureerbareDagen.factureerbareDagenRealisatie
+      : weekReports.reduce(
+          (sum, r) =>
+            sum +
+            r.entries.reduce((s, e) => s + (e.factureerbareDagen || 0), 0),
+          0
+        );
 
     return {
       week: `W${String(w.week).padStart(2, "0")}`,
@@ -158,8 +175,10 @@ export async function get12WeeksChartData() {
       klanten_realisatie: realisatieKlanten,
       afspraken_prognose: prognoseAfspraken,
       afspraken_realisatie: realisatieAfspraken,
+      weekcijfer_prognose: 7,
       weekcijfer: gemiddeldWeekcijfer,
-      factureerbare_dagen: totalFactureerbareDagen,
+      factureerbare_prognose: 45,
+      factureerbare_dagen: totalFactureerbareDagen || 0,
     };
   });
 
