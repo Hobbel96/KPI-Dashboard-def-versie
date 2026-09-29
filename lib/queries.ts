@@ -7,6 +7,12 @@ const klantenRealisatieData = {
   32: 22, 33: 19, 34: 7, 35: 22, 36: 25, 37: 37, 38: 28,
 };
 
+const klantenPrognosisData = {
+  16: 0, 17: 0, 18: 0, 19: 0, 20: 0, 21: 0, 22: 0, 23: 0,
+  24: 10, 25: 16, 26: 16, 27: 21.5, 28: 23.5, 29: 15.5, 30: 15, 31: 19,
+  32: 18, 33: 15.5, 34: 18.5, 35: 19.5, 36: 23.5, 37: 32.5, 38: 28.5,
+};
+
 export async function get12WeeksChartData() {
   const weeks = [];
 
@@ -101,10 +107,13 @@ export async function get12WeeksChartData() {
         );
 
     // Klanten
-    const prognoseKlanten = weekPrognoses.reduce(
-      (sum, p) => sum + (p.klanten || 0),
-      0
-    );
+    const hardcodedKlantenPrognose = klantenPrognosisData[w.week as keyof typeof klantenPrognosisData];
+    const prognoseKlanten = hardcodedKlantenPrognose !== undefined
+      ? hardcodedKlantenPrognose
+      : weekPrognoses.reduce(
+          (sum, p) => sum + (p.klanten || 0),
+          0
+        );
 
     const mtKlantenData = weekPrognoses.reduce(
       (sum, p) => sum + (p.klanten || 0),
