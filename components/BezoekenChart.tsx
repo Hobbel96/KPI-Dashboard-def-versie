@@ -27,7 +27,7 @@ export function BezoekenChart({ data }: BezoekenChartProps) {
   return (
     <div className="w-full h-80 bg-surface rounded-lg border border-line p-6">
       <h3 className="text-lg font-bold text-charcoal mb-4">
-        Bezoeken
+        Bezoeken (WAM)
       </h3>
       <ResponsiveContainer width="100%" height="100%">
         <LineChart
