@@ -146,14 +146,14 @@ export async function get12WeeksChartData() {
         );
 
     const hardcodedBezoekenRealisatie = bezoekenRealisatieData[w.week as keyof typeof bezoekenRealisatieData];
-    const mtBezoekenData = weekPrognoses.reduce(
-      (sum, p) => sum + (p.bezoeken || 0),
+    const mtBezoekenRealisatie = weekPrognoses.reduce(
+      (sum, p) => sum + (p.bezoekenRealisatie || 0),
       0
     );
     const realisatieBezoeken = hardcodedBezoekenRealisatie
       ? hardcodedBezoekenRealisatie
-      : mtBezoekenData > 0
-      ? mtBezoekenData
+      : mtBezoekenRealisatie > 0
+      ? mtBezoekenRealisatie
       : weekReports.reduce(
           (sum, r) =>
             sum +
@@ -170,18 +170,16 @@ export async function get12WeeksChartData() {
           0
         );
 
-    const mtKlantenData = weekPrognoses.reduce(
-      (sum, p) => sum + (p.klanten || 0),
+    const hardcodedKlantenRealisatie = klantenRealisatieData[w.week as keyof typeof klantenRealisatieData];
+    const mtKlantenRealisatie = weekPrognoses.reduce(
+      (sum, p) => sum + (p.klantenRealisatie || 0),
       0
     );
 
-    // Check if we have hardcoded realisatie from Excel
-    const hardcodedKlantenRealisatie = klantenRealisatieData[w.week as keyof typeof klantenRealisatieData];
-
     const realisatieKlanten = hardcodedKlantenRealisatie
       ? hardcodedKlantenRealisatie
-      : mtKlantenData > 0
-      ? mtKlantenData
+      : mtKlantenRealisatie > 0
+      ? mtKlantenRealisatie
       : weekReports.reduce(
           (sum, r) =>
             sum +
@@ -199,14 +197,14 @@ export async function get12WeeksChartData() {
         );
 
     const hardcodedAfsprakenRealisatie = afsprakenRealisatieData[w.week as keyof typeof afsprakenRealisatieData];
-    const mtAfsprakenData = weekPrognoses.reduce(
-      (sum, p) => sum + (p.afspraken || 0),
+    const mtAfsprakenRealisatie = weekPrognoses.reduce(
+      (sum, p) => sum + (p.afsprakenRealisatie || 0),
       0
     );
     const realisatieAfspraken = hardcodedAfsprakenRealisatie
       ? hardcodedAfsprakenRealisatie
-      : mtAfsprakenData > 0
-      ? mtAfsprakenData
+      : mtAfsprakenRealisatie > 0
+      ? mtAfsprakenRealisatie
       : weekReports.reduce(
           (sum, r) =>
             sum +
@@ -214,20 +212,20 @@ export async function get12WeeksChartData() {
           0
         );
 
-    // Weekcijfer (MT leidend)
-    const mtWeekcijfers = weekPrognoses
-      .map((p) => p.weekcijfer)
+    // Weekcijfer (MT realisatie leidend)
+    const mtWeekcijfersRealisatie = weekPrognoses
+      .map((p) => p.weekcijferRealisatie)
       .filter((wc) => wc !== null && wc !== undefined) as number[];
 
-    const weekcijfers = mtWeekcijfers.length > 0
-      ? mtWeekcijfers
+    const weekcijfersRealisatie = mtWeekcijfersRealisatie.length > 0
+      ? mtWeekcijfersRealisatie
       : weekReports
           .map((r) => r.weekcijfer)
           .filter((wc) => wc !== null && wc !== undefined) as number[];
 
-    const gemiddeldWeekcijfer = weekcijfers.length > 0
+    const gemiddeldWeekcijfer = weekcijfersRealisatie.length > 0
       ? Math.round(
-          (weekcijfers.reduce((sum, wc) => sum + wc, 0) / weekcijfers.length) * 10
+          (weekcijfersRealisatie.reduce((sum, wc) => sum + wc, 0) / weekcijfersRealisatie.length) * 10
         ) / 10
       : 0;
 
@@ -255,14 +253,14 @@ export async function get12WeeksChartData() {
         );
 
     const hardcodedNieuweAfsprakenRamRealisatie = nieuweAfsprakenRamRealisatieData[w.week as keyof typeof nieuweAfsprakenRamRealisatieData];
-    const mtNieuweAfsprakenRamData = weekPrognoses.reduce(
-      (sum, p) => sum + (p.nieuweAfspraken || 0),
+    const mtNieuweAfsprakenRamRealisatie = weekPrognoses.reduce(
+      (sum, p) => sum + (p.nieuweAfsprakenRealisatie || 0),
       0
     );
     const realisatieNieuweAfsprakenRam = hardcodedNieuweAfsprakenRamRealisatie
       ? hardcodedNieuweAfsprakenRamRealisatie
-      : mtNieuweAfsprakenRamData > 0
-      ? mtNieuweAfsprakenRamData
+      : mtNieuweAfsprakenRamRealisatie > 0
+      ? mtNieuweAfsprakenRamRealisatie
       : 0;
 
     // Nieuwe deals RAM
@@ -275,14 +273,14 @@ export async function get12WeeksChartData() {
         );
 
     const hardcodedNieuweDealRamRealisatie = nieuweDealRamRealisatieData[w.week as keyof typeof nieuweDealRamRealisatieData];
-    const mtNieuweDealRamData = weekPrognoses.reduce(
-      (sum, p) => sum + (p.deals || 0),
+    const mtNieuweDealRamRealisatie = weekPrognoses.reduce(
+      (sum, p) => sum + (p.dealsRealisatie || 0),
       0
     );
     const realisatieNieuweDealRam = hardcodedNieuweDealRamRealisatie
       ? hardcodedNieuweDealRamRealisatie
-      : mtNieuweDealRamData > 0
-      ? mtNieuweDealRamData
+      : mtNieuweDealRamRealisatie > 0
+      ? mtNieuweDealRamRealisatie
       : 0;
 
     return {
