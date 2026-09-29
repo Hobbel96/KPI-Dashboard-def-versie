@@ -125,7 +125,7 @@ model Prognose {
   isoYear            Int
   isoWeek            Int
 
-  // Prognose values (same fields as realization)
+  // Prognose values (existing fields, kept for backwards compatibility)
   weekcijfer         Float?
   werkdagen          Float?
   factureerbareDagen Float?
@@ -135,11 +135,18 @@ model Prognose {
   nieuweAfspraken    Int?
   deals              Int?
 
+  // Realisatie values (new fields)
+  weekcijferRealisatie         Float?
+  werkdagenRealisatie          Float?
+  factureerbareDagenRealisatie Float?
+  bezoekenRealisatie           Int?
+  klantenRealisatie            Int?
+  afsprakenRealisatie          Int?
+  nieuweAfsprakenRealisatie    Int?
+  dealsRealisatie              Int?
+
   // Bezettingsgraad realisatie (loaded directly from KPI Dashboard)
   bezettingsgradRealisatiePercentage Float?
-
-  // Factureerbare dagen realisatie (loaded directly from KPI Dashboard)
-  factureerbareDagenRealisatie Float?
 
   // Metadata
   enteredById        String

@@ -174,17 +174,17 @@ export default async function PrognósesPage() {
                       <input
                         type="number"
                         step="0.5"
-                        name="weekcijfer"
+                        name="weekcijferRealisatie"
                         placeholder="Weekcijfer"
-                        defaultValue={prognose?.weekcijfer || ""}
+                        defaultValue={prognose?.weekcijferRealisatie || ""}
                         className="px-3 py-2 border border-line rounded text-sm"
                       />
                       <input
                         type="number"
                         step="0.5"
-                        name="werkdagen"
+                        name="werkdagenRealisatie"
                         placeholder="Werkdagen"
-                        defaultValue={prognose?.werkdagen || ""}
+                        defaultValue={prognose?.werkdagenRealisatie || ""}
                         className="px-3 py-2 border border-line rounded text-sm"
                       />
                       <input
@@ -195,44 +195,48 @@ export default async function PrognósesPage() {
                         defaultValue={prognose?.factureerbareDagenRealisatie || ""}
                         className="px-3 py-2 border border-line rounded text-sm"
                       />
+
+                      {/* WAM fields */}
                       <input
                         type="number"
                         step="1"
-                        name="bezoeken"
-                        placeholder="Bezoeken"
-                        defaultValue={prognose?.bezoeken || ""}
+                        name="bezoekenRealisatie"
+                        placeholder="Bezoeken (WAM)"
+                        defaultValue={prognose?.bezoekenRealisatie || ""}
                         className="px-3 py-2 border border-line rounded text-sm"
                       />
                       <input
                         type="number"
                         step="1"
-                        name="klanten"
-                        placeholder="Klanten"
-                        defaultValue={prognose?.klanten || ""}
+                        name="klantenRealisatie"
+                        placeholder="Klanten (WAM)"
+                        defaultValue={prognose?.klantenRealisatie || ""}
                         className="px-3 py-2 border border-line rounded text-sm"
                       />
                       <input
                         type="number"
                         step="1"
-                        name="afspraken"
-                        placeholder="Afspraken"
-                        defaultValue={prognose?.afspraken || ""}
+                        name="afsprakenRealisatie"
+                        placeholder="Afspraken (WAM)"
+                        defaultValue={prognose?.afsprakenRealisatie || ""}
+                        className="px-3 py-2 border border-line rounded text-sm"
+                      />
+
+                      {/* RAM fields */}
+                      <input
+                        type="number"
+                        step="1"
+                        name="nieuweAfsprakenRealisatie"
+                        placeholder="Nieuwe afspraken (RAM)"
+                        defaultValue={prognose?.nieuweAfsprakenRealisatie || ""}
                         className="px-3 py-2 border border-line rounded text-sm"
                       />
                       <input
                         type="number"
                         step="1"
-                        name="nieuweAfspraken"
-                        placeholder="Nieuwe afspraken"
-                        defaultValue={prognose?.nieuweAfspraken || ""}
-                        className="px-3 py-2 border border-line rounded text-sm"
-                      />
-                      <input
-                        type="number"
-                        step="1"
-                        name="deals"
-                        placeholder="Deals"
-                        defaultValue={prognose?.deals || ""}
+                        name="dealsRealisatie"
+                        placeholder="Deals (RAM)"
+                        defaultValue={prognose?.dealsRealisatie || ""}
                         className="px-3 py-2 border border-line rounded text-sm"
                       />
 
