@@ -44,10 +44,10 @@ export default async function DashboardPage() {
                 </tr>
               </thead>
               <tbody>
-                {data.ams.map((am) => (
-                  <tr key={am.id} className="border-b border-line hover:bg-bg-soft">
-                    <td className="py-3 px-2 font-medium">{am.name}</td>
-                    <td className="py-3 px-2 text-right">{Math.round(am.totalFactureerbar || 0)}</td>
+                {data.amStats.map((am) => (
+                  <tr key={am.amId} className="border-b border-line hover:bg-bg-soft">
+                    <td className="py-3 px-2 font-medium">{am.amName}</td>
+                    <td className="py-3 px-2 text-right">{Math.round(am.totalFactureerbareDagen || 0)}</td>
                   </tr>
                 ))}
               </tbody>
